@@ -1,14 +1,19 @@
 import _ from 'lodash';
 import jsonPlaceholder from '../apis/jsonPlaceholder';
 
+// 2nd method
 export const fetchPostsAndUsers = () => async (dispatch, getState) => {
     await dispatch(fetchPosts());
 
     // get unique user ids 
-    const userIds = _.uniq(_.map(getState().posts, 'userId'));
+    // const userIds = _.uniq(_.map(getState().posts, 'userId'));
+    // userIds.forEach(id => dispatch(fetchUser(id))); // no need to put await in front of dispatch, as we don't have any logic after fetching user
 
-    userIds.forEach(id => dispatch(fetchUser(id))); // no need to put await in front of dispatch, as we don't have any logic after fetching user
-
+    _.chain(getState().posts)
+        .map('userId')
+        .uniq()
+        .forEach(id => dispatch(fetchUser(id)))
+        .value(); //execute
 };
 
 export const fetchPosts = () => { // return a function to be handled by the middleware thunk
